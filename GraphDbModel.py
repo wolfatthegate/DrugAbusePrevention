@@ -14,33 +14,27 @@ class GraphDbModel:
 
     def insert(self, tweets):
         with self.driver.session() as session:
-            count = 1
-            for tweet in tweets:
-                if count == 1:
-                    print(tweet)
-                if count == 22:
-                    print(tweet)
-
-                message = session.write_transaction(self._create_and_return_tweet, tweet)
-                if self.verbose == 1:
-                    print(count, '.\t', message)
-                count = count + 1
+            message = session.write_transaction(self._create_and_return_tweet, tweets)
+            if self.verbose == 1:
+                print(message)
+                # print(tweets)
 
     @staticmethod
-    def _create_and_return_tweet(tx, tweet):
-        result = tx.run("MERGE (t:tweet) on create SET t.id = $tweet.id "
-                        "MERGE (u:user) on create SET u.id=$tweet.userId "
-                        "MERGE (l:location) on create SET l.id=$tweet.locationId "
-                        "MERGE (p:place) on create SET p.id=$tweet.placeId "
+    def _create_and_return_tweet(tx, tweets):
+        result = tx.run("UNWIND $tweets as tweet "
+                        "MERGE (t:tweet {id:tweet.id}) "
+                        "MERGE (u:user {id:tweet.userId}) "
+                        "MERGE (l:location {id:tweet.locationId}) "
+                        "MERGE (p:place {id:tweet.placeId}) "
                         "MERGE (u)-[:at]->(l) "
                         "MERGE (u)-[:send]->(t) "
                         "MERGE (t)-[:tag]->(p) "
-                        # "FOREACH (val IN $tweet.hashtags | MERGE (h:hashtag) on create SET h.id=val MERGE (t)-[:tag]->(h))"
-                        # "FOREACH (val IN $tweet.urls | MERGE (url:url) on create SET url.id=val MERGE (t)-[:include]->(url))"
-                        # "FOREACH (val IN $tweet.medias | MERGE (m:media) on create SET  m.id=val MERGE (t)-[:has]->(m))"
-                        # "FOREACH (val IN $tweet.user_mentions | MERGE (u1:user)  on create SET u1.id=val MERGE (t)-[:mention]->(u1)) "
-                        "RETURN 'User: '+ u.id + ' sent '+ 'tweet: '+ t.id ", tweet=tweet)
-        return result.single()[0]
+                        "FOREACH (val IN tweet.hashtags | MERGE (h:hashtag) on create SET h.id=val MERGE (t)-[:tag]->(h))"
+                        "FOREACH (val IN tweet.urls | MERGE (url:url) on create SET url.id=val MERGE (t)-[:include]->(url))"
+                        "FOREACH (val IN tweet.medias | MERGE (m:media) on create SET  m.id=val MERGE (t)-[:has]->(m))"
+                        "FOREACH (val IN tweet.user_mentions | MERGE (u1:user)  on create SET u1.id=val MERGE (t)-[:mention]->(u1)) "
+                        "RETURN 'User: '+ u.id + ' sent '+ 'tweet: '+ t.id ", tweets=tweets)
+        return result
 
 
 if __name__ == "__main__":

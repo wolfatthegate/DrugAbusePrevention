@@ -12,8 +12,19 @@ def _create_tweet_model(json_obj):
     tweetId = json_obj['id']
     locationId = json_obj['user']['location']
     placeId = json_obj['place']['id']
+
+    # todo need to parse hashtags, urls, medias, user_mentions
+    # todo need to handle null location
+    if not locationId:
+        locationId = 'l'
+
     tweet = {'id': tweetId, 'userId': userId, 'locationId': locationId, 'placeId': placeId, 'hashtags': [], 'urls': [], 'medias': [], 'user_mentions': []}
-    return tweet
+
+    if userId and tweetId and locationId and placeId:
+        return tweet
+    else:
+        print('---- Empty ---- \t', tweet)
+        return {}
 
 
 class TweetParser:
@@ -34,7 +45,8 @@ class TweetParser:
             for line in input_file:
                 obj = json.loads(line)
                 tweet = _create_tweet_model(obj)
-                self.tweets.append(tweet)
+                if len(tweet) != 0:
+                    self.tweets.append(tweet)
                 if verbose == 1:
                     print(count, '. \t', tweet)
                     count = count + 1
@@ -72,7 +84,7 @@ if __name__ == "__main__":
 
     parser = TweetParser(file)
     parser.extract_large_tweets()
-    graphModel = GraphDbModel("bolt://localhost:7687", "neo4j", "test")
+    graphModel = GraphDbModel("bolt://localhost:7687", "neo4j", "test", 1)
     graphModel.insert(parser.tweets)
     graphModel.close()
 
