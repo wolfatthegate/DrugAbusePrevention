@@ -7,8 +7,9 @@ def _create_tweet_package(json_obj):
     tweet_map = {'tweet': _process_tweet(json_obj), 'user': _process_user(json_obj), 'place': _process_place(json_obj)}
     entities = _process_entity(json_obj)
     tweet_map['urls'] = entities['urls']
-    tweet_map['medias'] = entities['medias']
+    tweet_map['media'] = entities['media']
     tweet_map['hashtags'] = entities['hashtags']
+    tweet_map['symbols'] = entities['symbols']
 
     json_data = json.dumps(tweet_map)
     return json_data
@@ -39,14 +40,16 @@ def _process_place(json_obj):
 
 
 def _process_entity(json_obj):
-    # TODO
     entities = json_obj['entities']
+    hashtags = entities['hashtags']
+    # media = entities['media']
     urls = entities['urls']
+    symbols = entities['symbols']
     # urls = [{'id': '', 'data': None}]
     # medias = [{'id': '', 'data': None}]
     # hashtags = [{'id': '', 'data': None}]
     # usermentions = []
-    return {'urls': {}, 'medias': {}, 'hashtags': {}}
+    return {'urls': urls, 'media': [], 'hashtags': hashtags, 'symbols': symbols}
 
 
 class TweetParserForMongoDB:
@@ -72,8 +75,8 @@ class TweetParserForMongoDB:
 
 if __name__ == "__main__":
     # filename = "single_tweet.json"
-    # filename = "nys_tweets_filtered_2017_0.json"
-    filename = "test"
+    filename = "nys_tweets_filtered_2017_0.json"
+    # filename = "test"
     filepath = "./data/"
     file = f"{filepath}{filename}"
 
