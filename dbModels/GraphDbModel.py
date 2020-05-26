@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from neo4j import GraphDatabase
 
 

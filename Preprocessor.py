@@ -1,13 +1,31 @@
 import json
-from pprint import pprint
-import numpy as np
-import pandas as pd
+
+from TweetParser import TweetParser
+from dbModels.MongoDbModel import MongoDbModel
 
 
 def main():
-    df = pd.read_json("./data/nys_tweets_filtered_2017_0.json", lines=True)
-    pprint(df.lines)
-    pass
+    # filename = "single_tweet.json"
+    filename = "nys_tweets_filtered_2017_0.json"
+    # filename = "test"
+    filepath = "./data/"
+    file = f"{filepath}{filename}"
+
+    parser = TweetParser(file)
+    parser.extract_large_tweets(1)
+
+    # graphModel = GraphDbModel("bolt://localhost:7687", "neo4j", "test", 1)
+    # graphModel.insert(parser.tweets)
+    # graphModel.close()
+
+    mongoDbModel = MongoDbModel('', 'twitter')
+    mongo_data = parser.data_package
+    for each_data in mongo_data:
+        json_data = json.loads(each_data)
+        for tableName in json_data.keys():
+            value = json_data[tableName]
+            if len(value) != 0:
+                mongoDbModel.insert(value['id'], value['data'], tableName)
 
 
 if __name__ == '__main__':
