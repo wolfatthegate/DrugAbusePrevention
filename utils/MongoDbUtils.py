@@ -40,13 +40,13 @@ def _process_place(json_obj):
 
 def _process_entity(json_obj):
     entities = json_obj['entities']
-    hashtags = entities['hashtags']
-    # media = entities['media']
-    urls = entities['urls']
-    symbols = entities['symbols']
-    # urls = [{'id': '', 'data': None}]
-    # medias = [{'id': '', 'data': None}]
-    # hashtags = [{'id': '', 'data': None}]
+    hashtags_data = entities['hashtags']
+    # media_data = entities['media']
+    urls_data = entities['urls']
+    symbols_data = entities['symbols']
+    urls = {'id': '', 'data': urls_data}
+    # medias = {'id': '', 'data': media_data}
+    hashtags = {'id': '', 'data': hashtags_data}
+    symbols = {'id': '', 'data': symbols_data}
     # usermentions = []
-    return {'urls': urls, 'media': [], 'hashtags': hashtags, 'symbols': symbols}
-
+    return {'urls': urls, 'media': '', 'hashtags': hashtags, 'symbols': symbols}

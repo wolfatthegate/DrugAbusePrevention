@@ -19,14 +19,17 @@ def main():
     graphModel.insert(parser.tweets)
     graphModel.close()
 
-    mongoDbModel = MongoDbModel('', 'twitter')
+    mongoDbModel = MongoDbModel('mongodb://localhost:27017/', 'twitter')
     mongo_data = parser.data_package
     for each_data in mongo_data:
+        print(each_data)
         json_data = json.loads(each_data)
         for tableName in json_data.keys():
             value = json_data[tableName]
             if len(value) != 0:
-                mongoDbModel.insert(value['id'], value['data'], tableName)
+                print(tableName, '\t', value)
+                res = mongoDbModel.insert(value['id'], value['data'], tableName)
+                print(res)
 
 
 if __name__ == '__main__':

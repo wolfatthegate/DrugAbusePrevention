@@ -24,7 +24,7 @@ class TweetParser:
                 if len(tweet_package) != 0:
                     self.data_package.append(tweet_package)
                 if verbose == 1:
-                    print(count, '. \t ', tweet)
+                    # print(count, '. \t ', tweet)
                     print(count, '. \t ', tweet_package)
                     count = count + 1
 
